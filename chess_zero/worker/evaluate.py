@@ -169,8 +169,6 @@ def play_game(config, cur, ng, current_white: bool) -> (float, GoBangEnv, bool):
         else:
             action = black.action(env)
         env.step(action)
-        if env.num_halfmoves >= config.eval.max_game_length:
-            env.adjudicate()
 
     if env.winner == Winner.draw:
         ng_score = 0.5

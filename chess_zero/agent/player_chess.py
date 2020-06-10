@@ -322,18 +322,18 @@ class ChessPlayer:
         tau = np.power(self.play_config.tau_decay_rate, turn + 1)
         if tau < 0.1:
             tau = 0
-        if tau == 0:
+        if tau == 0:    # ??????????????
             action = np.argmax(policy)
             ret = np.zeros(self.labels_n)
             ret[action] = 1.0
             return ret
-        else:
+        else:           # ????????policy??n??
             ret = np.power(policy, 1/tau)
             ret /= np.sum(ret)
             return ret
 
     def calc_policy(self, env: GoBangEnv):
-        """calc π(a|s0)
+        """calc Ý€(a|s0)
         :return list(float): a list of probabilities of taking each action, calculated based on visit counts.
         """
         state = env.state_key
