@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.DS_Store
+.idea
+.so
+*.pgn
+data/
+logs/
+*.sh
+.vscode
