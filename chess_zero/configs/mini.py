@@ -8,7 +8,7 @@ class EvaluateConfig:
         self.game_num = 50
         self.replace_rate = 0.55
         self.play_config = PlayConfig()
-        self.play_config.simulation_num_per_move = 100 # 200
+        self.play_config.simulation_num_per_move = 200 # 200
         self.play_config.thinking_loop = 1
         self.play_config.c_puct = 1 # lower  = prefer mean action value
         self.play_config.tau_decay_rate = 0.6 # I need a better distribution...
@@ -31,14 +31,14 @@ class PlayConfig:
         self.max_processes = 3 # 3
         self.search_threads = 16 # 16
         self.vram_frac = 1.0
-        self.simulation_num_per_move = 50 # 100
+        self.simulation_num_per_move = 100 # 100
         self.thinking_loop = 1
         self.logging_thinking = False
-        self.c_puct = 1.5
-        self.noise_eps = 0.25
+        self.c_puct = 1.5 # 1.5
+        self.noise_eps = 0.25 # 0.25
         self.dirichlet_alpha = 0.3
-        self.tau_decay_rate = 0.99
-        self.virtual_loss = 3
+        self.tau_decay_rate = 0.825 # 超过12回合，tau为0
+        self.virtual_loss = 3 # 没有什么影响
         self.resign_threshold = -0.8
         self.min_resign_turn = 5
         self.max_game_length = 1000
@@ -56,7 +56,7 @@ class TrainerConfig:
         self.save_model_steps = 25
         self.load_data_steps = 100
         self.loss_weights = [1.25, 1.0] # [policy, value] prevent value overfit in SL
-
+        self.dropout = 0.4
 
 class ModelConfig:
     cnn_filter_num = 128
