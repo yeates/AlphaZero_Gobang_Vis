@@ -90,7 +90,7 @@ class OptimizeWorker:
                              batch_size=tc.batch_size,
                              epochs=epochs,
                              shuffle=True,
-                             validation_split=0.02,
+                             validation_split=0.1,
                              callbacks=[tensorboard_cb])
         steps = (state_ary.shape[0] // tc.batch_size) * epochs
         return steps
