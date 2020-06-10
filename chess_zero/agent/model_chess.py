@@ -11,7 +11,7 @@ from logging import getLogger
 from keras.engine.topology import Input
 from keras.engine.training import Model
 from keras.layers.convolutional import Conv2D
-from keras.layers.core import Activation, Dense, Flatten
+from keras.layers.core import Activation, Dense, Flatten, Dropout
 from keras.layers.merge import Add
 from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
@@ -67,7 +67,7 @@ class ChessModel:
                    name="input_conv-"+str(mc.cnn_first_filter_size)+"-"+str(mc.cnn_filter_num))(x)
         x = BatchNormalization(axis=1, name="input_batchnorm")(x)
         x = Activation("relu", name="input_relu")(x)
-
+        
         # for i in range(mc.res_layer_num):
         #     x = self._build_residual_block(x, i + 1)
 
@@ -89,6 +89,7 @@ class ChessModel:
         x = Activation("relu",name="value_relu")(x)
         x = Flatten(name="value_flatten")(x)
         x = Dense(mc.value_fc_size, kernel_regularizer=l2(mc.l2_reg), activation="relu", name="value_dense")(x)
+        x = Dropout(self.config.trainer.dropout)(x)
         value_out = Dense(1, kernel_regularizer=l2(mc.l2_reg), activation="tanh", name="value_out")(x)
 
         self.model = Model(in_x, [policy_out, value_out], name="chess_model")
