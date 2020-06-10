@@ -85,24 +85,12 @@ class ResourceConfig:
 #     return [repl(x) for x in create_uci_labels()]
 
 
-def create_uci_labels(): # 改了原代码
-    """
-    Creates the labels for the universal chess interface into an array and returns them
-    :return:所有可以落子的动作的命令，如'14_1_1'，15行1列放置了一枚黑棋
-    """
-    labels_array = []
-    players = [1, -1] # 1为黑棋，-1为白棋
-    PANEL_SIZE = 15  # 棋盘宽度
-    for row in range(PANEL_SIZE):
-        for col in range(PANEL_SIZE):
-            labels_array.append(f'{row}_{col}_{players[0]}')
-            labels_array.append(f'{row}_{col}_{players[1]}')
-    return labels_array
+
 
 
 # ------- 棋盘翻转 -------
 
-PANEL_SIZE = 15
+PANEL_SIZE = 15  # 棋盘宽度
 
 table_90l = np.zeros((15,15)).tolist()
 table_90r = np.zeros((15,15)).tolist()
@@ -119,6 +107,44 @@ tables = [table_90l
             ,table_90l_m
             ,table_90r_m
             ,table_180_m]
+
+def create_uci_labels(): # 改了原代码
+    """
+    Creates the labels for the universal chess interface into an array and returns them
+    :return:所有可以落子的动作的命令，如'14_1_1'，15行1列放置了一枚黑棋
+    """
+    labels_array = []
+    players = [1, -1] # 1为黑棋，-1为白棋
+    for row in range(PANEL_SIZE):
+        for col in range(PANEL_SIZE):
+            labels_array.append(f'{row}_{col}_{players[0]}')
+            labels_array.append(f'{row}_{col}_{players[1]}')
+    return labels_array
+
+
+def create_flip_index(labels):    # 用表储存转换信息
+    arr = np.arange(PANEL_SIZE * PANEL_SIZE).reshape((PANEL_SIZE, PANEL_SIZE))
+    new_arrs = np.array(flip_combinations(arr))
+    for k in range(len(new_arrs)):
+        a = new_arrs[k]
+        t = tables[k]
+        for i in range(PANEL_SIZE*PANEL_SIZE):
+            new_row, new_col = np.where(a == i)
+            new_row, new_col = new_row[0], new_col[0]
+            ori_row, ori_col = int(i / PANEL_SIZE), i % PANEL_SIZE
+            t[ori_row][ori_col] = [new_row, new_col]
+    
+    move_lookup = {move: i for move, i in zip(labels, range(int(len(labels))))}
+    
+    new_indexes = []
+    for t in tables:
+        idx = []
+        for ori_label in labels:
+            ori_row, ori_col, no = ori_label.split('_')
+            new_row, new_col = t[int(ori_row)][int(ori_col)]
+            idx.append(move_lookup[str(new_row) + '_' + str(new_col) + '_' + str(no)])
+        new_indexes.append(idx)
+    return new_indexes
 
 
 def flip_index_adaption(policy):
@@ -161,30 +187,6 @@ def flip90_right(arr):
     new_arr = np.transpose(new_arr)[::-1]
     return new_arr
 
-
-def create_flip_index(labels):    # 用表储存转换信息
-    arr = np.arange(15 * 15).reshape((15, 15))
-    new_arrs = np.array(flip_combinations(arr))
-    for k in range(len(new_arrs)):
-        a = new_arrs[k]
-        t = tables[k]
-        for i in range(15*15):
-            new_row, new_col = np.where(a == i)
-            new_row, new_col = new_row[0], new_col[0]
-            ori_row, ori_col = int(i / 15), i % 15
-            t[ori_row][ori_col] = [new_row, new_col]
-    
-    move_lookup = {move: i for move, i in zip(labels, range(int(len(labels))))}
-    
-    new_indexes = []
-    for t in tables:
-        idx = []
-        for ori_label in labels:
-            ori_row, ori_col, no = ori_label.split('_')
-            new_row, new_col = t[int(ori_row)][int(ori_col)]
-            idx.append(move_lookup[str(new_row) + '_' + str(new_col) + '_' + str(no)])
-        new_indexes.append(idx)
-    return new_indexes
 
 
 class Config:
@@ -239,7 +241,7 @@ class Config:
     def flip_moves(moves):
         """
 
-        : 旋转、翻转原始的moves数据[state, policy]，并生成对应的moves数据
+        : 旋转、翻转原始的moves数据[state_key, policy]，并生成对应的moves数据
         :return: fliped moves' data
         """
         state, policy = moves

@@ -3,7 +3,7 @@ import os
 from glob import glob
 import json
 
-PANEL_SIZE = 2
+PANEL_SIZE = 3
 
 table_90l = np.zeros((PANEL_SIZE, PANEL_SIZE)).tolist()
 table_90r = np.zeros((PANEL_SIZE, PANEL_SIZE)).tolist()
@@ -122,6 +122,7 @@ def write_game_data_to_file(path, data):
         
         
 # def testify():
+    
 
 if __name__ == '__main__':
     # pattern = '/home/ideal/yuyongsheng/AlphaZero_Gobang_Vis/data/to_data/play_*.json'
@@ -140,7 +141,7 @@ if __name__ == '__main__':
     #     write_game_data_to_file(f, new_data)
     
     print(Config.n_labels)
-    state, policy = [[[0,1],[2,3]], np.arange(Config.n_labels).tolist()]
+    state, policy = [[[0,1,2],[3,4,5], [6,7,8]], np.arange(Config.n_labels).tolist()]
     fliped_states = flip_combinations(state)
     fliped_policies = flip_index_adaption(policy)
     print(type(fliped_states), type(fliped_policies))
