@@ -61,6 +61,27 @@ class ChessModel:
         mc = self.config.model
         in_x = x = Input((1, 15, 15)) # 输入为15*15的棋盘
 
+        # x = Flatten()(x)
+        # x = Dense(2048, activation='relu', kernel_regularizer=l2(mc.l2_reg))(x)
+        # x = Dense(1024, activation='relu', kernel_regularizer=l2(mc.l2_reg))(x)
+        # x = Dropout(self.config.trainer.dropout)(x)
+        # #res_out = x
+        # # for policy out
+        # x = Dense(512, activation='relu',
+        #           kernel_regularizer=l2(mc.l2_reg))(x)
+        # x = BatchNormalization(axis=1, name="policy_batchnorm")(x)
+        # x = Activation("relu", name="policy_relu")(x)
+        # policy_out = Dense(self.config.n_labels, activation="softmax",
+        #                    name="policy_out", kernel_regularizer=l2(mc.l2_reg))(x)
+        # # for value output
+        # x = Dense(128, activation='relu',
+        #           kernel_regularizer=l2(mc.l2_reg))(x)
+        # x = BatchNormalization(axis=1, name="value_batchnorm")(x)
+        # x = Activation("relu", name="value_relu")(x)
+        # value_out = Dense(1, name="value_out", activation="tanh",
+        #                   kernel_regularizer=l2(mc.l2_reg))(x)
+        # self.model = Model(in_x, [policy_out, value_out], name="chess_model")
+
         # (batch, channels, height, width)
         x = Conv2D(filters=mc.cnn_filter_num, kernel_size=mc.cnn_first_filter_size, padding="same",
                    data_format="channels_first", use_bias=False, kernel_regularizer=l2(mc.l2_reg),
@@ -68,8 +89,8 @@ class ChessModel:
         x = BatchNormalization(axis=1, name="input_batchnorm")(x)
         x = Activation("relu", name="input_relu")(x)
         
-        # for i in range(mc.res_layer_num):
-        #     x = self._build_residual_block(x, i + 1)
+        for i in range(mc.res_layer_num):
+            x = self._build_residual_block(x, i + 1)
 
         res_out = x
         
