@@ -221,13 +221,7 @@ def play_game(config, cur, ng, current_white: bool) -> (float, GoBangEnv, bool):
         data.append(black.moves[i])
         if i < len(white.moves):
             data.append(white.moves[i])
-    
-    if env.winner == Winner.white:
-            black_score, white_score = -1, 1
-    elif env.winner == Winner.black:
-        black_score, white_score = 1, -1
-    else:
-        black_score, white_score = -0.5, -0.5
+
 # --------------------
 
     cur.append(cur_pipes)
