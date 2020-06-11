@@ -3,13 +3,14 @@ Manages starting off each of the separate processes involved in ChessZero -
 self play, training, and evaluation.
 """
 import argparse
-
+import os
 from logging import getLogger,disable
 
 from .lib.logger import setup_logger
 from .config import Config
 
 logger = getLogger(__name__)
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 CMD_LIST = ['self', 'opt', 'eval', 'sl', 'uci']
 
@@ -58,14 +59,25 @@ def start():
     setup(config, args)
 
     logger.info(f"config type: {config_type}")
+    
+    import chess_zero.lib.tf_util as ttt
 
     if args.cmd == 'self':
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+        ttt.set_session_config(allow_growth=True)
         from .worker import self_play
         return self_play.start(config)
     elif args.cmd == 'opt':
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+        ttt.set_session_config(allow_growth=True)
         from .worker import optimize
         return optimize.start(config)
     elif args.cmd == 'eval':
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+        ttt.set_session_config(allow_growth=True)
         from .worker import evaluate
         return evaluate.start(config)
     elif args.cmd == 'sl':
