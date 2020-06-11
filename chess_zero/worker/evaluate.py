@@ -7,13 +7,15 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from logging import getLogger
 from multiprocessing import Manager
 from time import sleep
+from datetime import datetime
+from threading import Thread
 
 from chess_zero.agent.model_chess import ChessModel
 from chess_zero.agent.player_chess import ChessPlayer
 from chess_zero.config import Config
 from chess_zero.env.chess_env import GoBangEnv, Winner, pretty_print_panel
-from chess_zero.lib.data_helper import get_next_generation_model_dirs
-from chess_zero.lib.model_helper import save_as_best_model, load_best_model_weight
+from chess_zero.lib.data_helper import get_next_generation_model_dirs, write_game_data_to_file
+from chess_zero.lib.model_helper import save_as_best_model, load_best_model_weight, reload_best_model_weight_if_changed
 
 logger = getLogger(__name__)
 
@@ -66,7 +68,7 @@ class EvaluateWorker:
         :return: true iff this model is better than the current_model
         """
         ng_pipes = self.m.list([ng_model.get_pipes(self.play_config.search_threads) for _ in range(self.play_config.max_processes)])
-
+        self.buffer = []
         futures = []
         with ProcessPoolExecutor(max_workers=self.play_config.max_processes) as executor:
             for game_idx in range(self.config.eval.game_num):
@@ -76,7 +78,7 @@ class EvaluateWorker:
             results = []
             for fut in as_completed(futures):
                 # ng_score := if ng_model win -> 1, lose -> 0, draw -> 0.5
-                ng_score, env, current_white = fut.result()
+                ng_score, env, current_white, data = fut.result()
                 print()
                 pretty_print_panel(env.board.panel)
                 results.append(ng_score)
@@ -90,12 +92,18 @@ class EvaluateWorker:
                 #     colors = reversed(colors)
                 # pretty_print(env, colors)
 
+                self.buffer += data
+                
                 if len(results)-sum(results) >= self.config.eval.game_num * (1-self.config.eval.replace_rate):
+                    self.flush_buffer()     # save play data
                     logger.debug(f"lose count reach {results.count(0)} so give up challenge")
                     return False
                 if sum(results) >= self.config.eval.game_num * self.config.eval.replace_rate:
+                    self.flush_buffer()  # save play data
                     logger.debug(f"win count reach {results.count(1)} so change best model")
                     return True
+            
+
 
         win_rate = sum(results) / len(results)
         logger.debug(f"winning rate {win_rate*100:.1f}%")
@@ -108,7 +116,7 @@ class EvaluateWorker:
         :param file model_dir: directory where model should be moved
         """
         rc = self.config.resource
-        new_dir = os.path.join(rc.next_generation_model_dir, "copies", model_dir.name)
+        new_dir = os.path.join(rc.next_generation_model_dir, "copies", model_dir)
         os.rename(model_dir, new_dir)
 
     def load_current_model(self):
@@ -139,6 +147,17 @@ class EvaluateWorker:
         model.load(config_path, weight_path)
         return model, model_dir
 
+    def flush_buffer(self):
+        """
+        Flush the play data buffer and write the data to the appropriate location
+        """
+        rc = self.config.resource
+        game_id = datetime.now().strftime("%Y%m%d-%H%M%S.%f")
+        path = os.path.join(rc.play_data_dir, rc.play_data_filename_tmpl % game_id)
+        logger.info(f"save play data to {path}")
+        thread = Thread(target=write_game_data_to_file, args=(path, self.buffer))
+        thread.start()
+        self.buffer = []
 
 def play_game(config, cur, ng, current_white: bool) -> (float, GoBangEnv, bool):
     """
@@ -177,6 +196,32 @@ def play_game(config, cur, ng, current_white: bool) -> (float, GoBangEnv, bool):
     else:
         ng_score = 1
     
+
+# ----- 整理moves -----
+    if env.winner == Winner.white:
+        black_score, white_score = -1, 1
+    elif env.winner == Winner.black:
+        black_score, white_score = 1, -1
+    else:
+        black_score, white_score = -0.5, -0.5
+
+    black.finish_game(black_score)
+    white.finish_game(white_score)
+
+    data = []
+    for i in range(len(black.moves)):
+        data.append(black.moves[i])
+        if i < len(white.moves):
+            data.append(white.moves[i])
+    
+    if env.winner == Winner.white:
+            black_score, white_score = -1, 1
+    elif env.winner == Winner.black:
+        black_score, white_score = 1, -1
+    else:
+        black_score, white_score = -0.5, -0.5
+# --------------------
+
     cur.append(cur_pipes)
     ng.append(ng_pipes)
-    return ng_score, env, current_white
+    return ng_score, env, current_white, data
