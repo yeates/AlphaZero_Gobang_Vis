@@ -66,8 +66,7 @@ class OptimizeWorker:
         total_steps = self.config.trainer.start_total_steps
 
         cnt = 0
-        while True:
-            cnt += 1
+        while True:            
             if cnt % 3 == 0:
                 print('load latest play data.')
                 import gc
@@ -86,7 +85,8 @@ class OptimizeWorker:
                 a.popleft()
                 b.popleft()
                 c.popleft()
-
+            cnt += 1
+            
     def train_epoch(self, epochs):
         """
         Runs some number of epochs of training

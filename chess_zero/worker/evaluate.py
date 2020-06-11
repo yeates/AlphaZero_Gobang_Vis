@@ -9,6 +9,7 @@ from multiprocessing import Manager
 from time import sleep
 from datetime import datetime
 from threading import Thread
+from collections import Counter
 
 from chess_zero.agent.model_chess import ChessModel
 from chess_zero.agent.player_chess import ChessPlayer
@@ -143,7 +144,8 @@ class EvaluateWorker:
             sleep(60)
         model_dir = dirs[-1] if self.config.eval.evaluate_latest_first else dirs[0]
         i = -1
-        while model_dir in self.evaluated_model_name:   # evaluate a model only once
+        while model_dir in self.evaluated_model_name:
+        #while Counter(self.evaluated_model_name)[model_dir] >= 2:   # evaluate a model only once
             i -= 1
             model_dir = dirs[i]
         config_path = os.path.join(model_dir, rc.next_generation_model_config_filename)
