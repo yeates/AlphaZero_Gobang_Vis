@@ -17,7 +17,7 @@ from chess_zero.env.chess_env import get_input_planes_by_state
 from chess_zero.lib.data_helper import get_game_data_filenames, read_game_data_from_file, get_next_generation_model_dirs
 from chess_zero.lib.model_helper import load_best_model_weight
 
-from keras.optimizers import Adam
+from keras.optimizers import Adam, RMSprop
 from keras.callbacks import TensorBoard
 logger = getLogger(__name__)
 
@@ -65,7 +65,18 @@ class OptimizeWorker:
         shuffle(self.filenames)
         total_steps = self.config.trainer.start_total_steps
 
+        cnt = 0
         while True:
+            cnt += 1
+            if cnt % 3 == 0:
+                print('load latest play data.')
+                import gc
+                del self.dataset
+                gc.collect()
+                self.dataset = deque(), deque(), deque()
+                self.filenames = deque(
+                    get_game_data_filenames(self.config.resource))
+                shuffle(self.filenames)
             self.fill_queue()
             steps = self.train_epoch(self.config.trainer.epoch_to_checkpoint)
             total_steps += steps
@@ -90,7 +101,7 @@ class OptimizeWorker:
                              batch_size=tc.batch_size,
                              epochs=epochs,
                              shuffle=True,
-                             validation_split=0.1,
+                             validation_split=0.001,
                              callbacks=[tensorboard_cb])
         steps = (state_ary.shape[0] // tc.batch_size) * epochs
         return steps
@@ -100,6 +111,7 @@ class OptimizeWorker:
         Compiles the model to use optimizer and loss function tuned for supervised learning
         """
         opt = Adam()
+        # opt = RMSprop()
         losses = ['categorical_crossentropy', 'mean_squared_error'] # avoid overfit for supervised 
         self.model.model.compile(optimizer=opt, loss=losses, loss_weights=self.config.trainer.loss_weights)
 
