@@ -8,10 +8,10 @@ class EvaluateConfig:
         self.game_num = 50
         self.replace_rate = 0.55
         self.play_config = PlayConfig()
-        self.play_config.simulation_num_per_move = 200 # 200
+        self.play_config.simulation_num_per_move = 75 # 200
         self.play_config.thinking_loop = 1
         self.play_config.c_puct = 1 # lower  = prefer mean action value
-        self.play_config.tau_decay_rate = 0.6 # I need a better distribution...
+        self.play_config.tau_decay_rate = 0.32 # I need a better distribution...
         self.play_config.noise_eps = 0
         self.evaluate_latest_first = True
         self.max_game_length = 1000
@@ -31,13 +31,13 @@ class PlayConfig:
         self.max_processes = 3 # 3
         self.search_threads = 16 # 16
         self.vram_frac = 1.0
-        self.simulation_num_per_move = 100 # 100
+        self.simulation_num_per_move = 50 # 100
         self.thinking_loop = 1
         self.logging_thinking = False
         self.c_puct = 1.5 # 1.5
         self.noise_eps = 0.25 # 0.25
-        self.dirichlet_alpha = 0.3
-        self.tau_decay_rate = 0.825 # 超过12回合，tau为0
+        self.dirichlet_alpha = 0.6
+        self.tau_decay_rate = 0.32 # 超过12回合，tau为0；0.32
         self.virtual_loss = 3 # 没有什么影响
         self.resign_threshold = -0.8
         self.min_resign_turn = 5
@@ -51,18 +51,18 @@ class TrainerConfig:
         self.vram_frac = 1.0
         self.batch_size = 384 # tune this to your gpu memory
         self.epoch_to_checkpoint = 1
-        self.dataset_size = 1000000
+        self.dataset_size = 1500000
         self.start_total_steps = 0
         self.save_model_steps = 25
         self.load_data_steps = 100
         self.loss_weights = [1.25, 1.0] # [policy, value] prevent value overfit in SL
-        self.dropout = 0.4
+        self.dropout = 0.5
 
 class ModelConfig:
     cnn_filter_num = 128
     cnn_first_filter_size = 5
     cnn_filter_size = 3
-    res_layer_num = 7
+    res_layer_num = 1
     l2_reg = 1e-4
     value_fc_size = 256
     distributed = False

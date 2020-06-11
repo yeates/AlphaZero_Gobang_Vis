@@ -44,7 +44,8 @@ class EvaluateWorker:
         self.current_model = self.load_current_model()
         self.m = Manager()
         self.cur_pipes = self.m.list([self.current_model.get_pipes(self.play_config.search_threads) for _ in range(self.play_config.max_processes)])
-
+        self.evaluated_model_name = []
+        
     def start(self):
         """
         Start evaluation, endlessly loading the latest models from the directory which stores them and
@@ -141,10 +142,15 @@ class EvaluateWorker:
             logger.info("There is no next generation model to evaluate")
             sleep(60)
         model_dir = dirs[-1] if self.config.eval.evaluate_latest_first else dirs[0]
+        i = -1
+        while model_dir in self.evaluated_model_name:   # evaluate a model only once
+            i -= 1
+            model_dir = dirs[i]
         config_path = os.path.join(model_dir, rc.next_generation_model_config_filename)
         weight_path = os.path.join(model_dir, rc.next_generation_model_weight_filename)
         model = ChessModel(self.config)
         model.load(config_path, weight_path)
+        self.evaluated_model_name.append(model_dir)
         return model, model_dir
 
     def flush_buffer(self):
