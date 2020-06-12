@@ -33,6 +33,7 @@ class GoBangEnv:
         self.winner = None  # type: Winner
         self.resigned = False
         self.result = None
+        self.previous_actions = np.array([])
 
     def reset(self):
         """
@@ -75,11 +76,19 @@ class GoBangEnv:
             return
 
         self.board.push_uci(action)
-
+        self.previous_actions = np.append(self.previous_actions, action)
+            
         self.num_halfmoves += 1
         
         self._game_over(self.board.result())
 
+
+    def regret_n_steps(self, step: int):
+        self.previous_actions, regret_actions = self.previous_actions[:-step], self.previous_actions[-step:]
+        for action in regret_actions:
+            self.board.regret(action)
+            self.num_halfmoves -= 1
+        
     def _game_over(self, results):
         # # 超过80总步，则判定双方负分。训练中后期取消这个设置
         # if self.num_halfmoves >= 60: # 初期设置为80

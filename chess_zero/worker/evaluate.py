@@ -97,7 +97,7 @@ class EvaluateWorker:
                 logger.debug(f"game {game_idx:3}: after {env.num_halfmoves} steps, ng_score={ng_score:.1f} as {'black' if current_white else 'white'} "
                              f"win_rate={win_rate*100:5.1f}% ")
                 
-                if len(ng_as_black) != 0:
+                if len(ng_as_black) != 0 and len(ng_as_white) != 0:
                     logger.debug(
                                  f"ng_model win_rate as black:{sum(ng_as_black)/len(ng_as_black)*100:5.1f}%; "
                                  f"ng_model win_rate as white:{sum(ng_as_white)/len(ng_as_white)*100:5.1f}%"

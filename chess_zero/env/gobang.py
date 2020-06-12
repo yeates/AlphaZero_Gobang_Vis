@@ -46,7 +46,13 @@ class Board:
             self.panel[row, col] = no
             #print(f"成功在{row+1}行,{col+1}列放置一枚{Player.WNAME.value if no == Player.WHITE.value else Player.BNAME.value}.")
             self.next_round()
-        
+    
+    def regret(self, action):
+        row, col, no = action.split('_')
+        row, col, no = int(row), int(col), int(no)
+        self.panel[row, col] = 0 # 置为0
+        self.next_round()
+    
     def result(self):   # 获取当前局面结果
         #starttime = time.time()
         score_b, score_w = 0, 0
