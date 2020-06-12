@@ -51,7 +51,7 @@ class TrainerConfig:
         self.vram_frac = 1.0
         self.batch_size = 384 # tune this to your gpu memory
         self.epoch_to_checkpoint = 1
-        self.dataset_size = 1500000
+        self.dataset_size = 2000000
         self.start_total_steps = 0
         self.save_model_steps = 25
         self.load_data_steps = 100

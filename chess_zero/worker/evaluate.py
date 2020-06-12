@@ -78,6 +78,7 @@ class EvaluateWorker:
                 futures.append(fut)
 
             results = []
+            ng_as_black = []
             for fut in as_completed(futures):
                 # ng_score := if ng_model win -> 1, lose -> 0, draw -> 0.5
                 ng_score, env, current_white, data = fut.result()
@@ -86,8 +87,18 @@ class EvaluateWorker:
                 results.append(ng_score)
                 win_rate = sum(results) / len(results)
                 game_idx = len(results)
+                
+                if current_white:
+                    ng_as_black.append(ng_score)
+                
                 logger.debug(f"game {game_idx:3}: after {env.num_halfmoves} steps, ng_score={ng_score:.1f} as {'black' if current_white else 'white'} "
                              f"win_rate={win_rate*100:5.1f}% ")
+                
+                if len(ng_as_black) != 0:
+                    logger.debug(
+                                 f"ng_model win_rate as black:{sum(ng_as_black)/len(ng_as_black)*100:5.1f}; "
+                                 f"ng_model win_rate as white:{(win_rate*2. - sum(ng_as_black)/len(ng_as_black))*100:5.1f}"
+                                 )
 
                 # colors = ("current_model", "ng_model")
                 # if not current_white:

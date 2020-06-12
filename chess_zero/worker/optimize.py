@@ -81,7 +81,7 @@ class OptimizeWorker:
             total_steps += steps
             self.save_current_model()
             a, b, c = self.dataset
-            while len(a) > self.config.trainer.dataset_size/2:
+            while len(a) > self.config.trainer.dataset_size * 4 / 5:
                 a.popleft()
                 b.popleft()
                 c.popleft()
