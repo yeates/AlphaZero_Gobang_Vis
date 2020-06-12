@@ -81,10 +81,10 @@ class GoBangEnv:
         self._game_over(self.board.result())
 
     def _game_over(self, results):
-        # 超过80总步，则判定双方负分
-        if self.num_halfmoves >= 60: # 初期设置为80
-            self.winner = Winner.draw
-            self.result = '1-1'
+        # # 超过80总步，则判定双方负分。训练中后期取消这个设置
+        # if self.num_halfmoves >= 60: # 初期设置为80
+        #     self.winner = Winner.draw
+        #     self.result = '1-1'
         # 再进行正常判定
         if self.winner is None and results != "*":
             self.result = results

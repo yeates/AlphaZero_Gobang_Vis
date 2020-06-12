@@ -96,8 +96,8 @@ class EvaluateWorker:
                 
                 if len(ng_as_black) != 0:
                     logger.debug(
-                                 f"ng_model win_rate as black:{sum(ng_as_black)/len(ng_as_black)*100:5.1f}; "
-                                 f"ng_model win_rate as white:{(win_rate*2. - sum(ng_as_black)/len(ng_as_black))*100:5.1f}"
+                                 f"ng_model win_rate as black:{sum(ng_as_black)/len(ng_as_black)*100:5.1f}%; "
+                                 f"ng_model win_rate as white:{(win_rate*2. - sum(ng_as_black)/len(ng_as_black))*100:5.1f}%"
                                  )
 
                 # colors = ("current_model", "ng_model")
