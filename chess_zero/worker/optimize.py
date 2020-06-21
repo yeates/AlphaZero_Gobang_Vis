@@ -67,7 +67,7 @@ class OptimizeWorker:
 
         cnt = 0
         while True:            
-            if cnt % 3 == 0:
+            if cnt % 5 == 0:
                 print('load latest play data.')
                 import gc
                 del self.dataset
@@ -81,7 +81,7 @@ class OptimizeWorker:
             total_steps += steps
             self.save_current_model()
             a, b, c = self.dataset
-            while len(a) > self.config.trainer.dataset_size * 4 / 5:
+            while len(a) > self.config.trainer.dataset_size / 2:
                 a.popleft()
                 b.popleft()
                 c.popleft()
@@ -101,7 +101,7 @@ class OptimizeWorker:
                              batch_size=tc.batch_size,
                              epochs=epochs,
                              shuffle=True,
-                             validation_split=0.001,
+                             validation_split=0.005,
                              callbacks=[tensorboard_cb])
         steps = (state_ary.shape[0] // tc.batch_size) * epochs
         return steps
