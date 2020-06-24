@@ -108,7 +108,7 @@ def play_game(config: Config, cur, robot_white: int) -> (float, GoBangEnv, int):
     configs = config.eval.play_config
     # man
     configs.simulation_num_per_move = 1200
-    configs.tau_decay_rate = 0
+    configs.tau_decay_rate = 0.
     #
     current_player = ChessPlayer(config, pipes=cur_pipes, play_config=configs)
     

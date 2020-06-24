@@ -8,10 +8,10 @@ class EvaluateConfig:
         self.game_num = 120
         self.replace_rate = 0.55
         self.play_config = PlayConfig()
-        self.play_config.simulation_num_per_move = 150 # 200
+        self.play_config.simulation_num_per_move = 300 # 200
         self.play_config.thinking_loop = 1
         self.play_config.c_puct = 1 # lower  = prefer mean action value
-        self.play_config.tau_decay_rate = 0.32 # I need a better distribution...
+        self.play_config.tau_decay_rate = 0.09 # I need a better distribution...
         self.play_config.noise_eps = 0
         self.evaluate_latest_first = True
         self.max_game_length = 1000
@@ -55,7 +55,7 @@ class TrainerConfig:
         self.start_total_steps = 0
         self.save_model_steps = 25
         self.load_data_steps = 100
-        self.loss_weights = [1.0, 1.25] # [policy, value] prevent value overfit in SL
+        self.loss_weights = [1.25, 1.0] # [policy, value] prevent value overfit in SL
         self.dropout = 0.5
 
 class ModelConfig:
