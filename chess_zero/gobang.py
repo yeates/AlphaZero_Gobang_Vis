@@ -15,7 +15,7 @@ from chess_zero.agent.model_chess import ChessModel
 from chess_zero.agent.player_chess import ChessPlayer
 from chess_zero.config import Config
 
-
+from time import sleep
 
 
 
@@ -44,7 +44,7 @@ class PvEWorker:
         while True:
             cur = self.cur_pipes.pop()
             play_config = self.play_config
-            play_config.simulation_num_per_move = 1200
+            play_config.simulation_num_per_move = 100
             play_config.tau_decay_rate = 0
             robot = ChessPlayer(self.config, pipes=cur, play_config=play_config)
             score = play_game(robot, (game_idx % 2) == 0)
@@ -204,6 +204,7 @@ def play_game(robot: ChessPlayer, robot_white: int) -> (float, GoBangEnv, int):
         put_text('白棋胜利，请重新游戏',screen,30)
     else:
         put_text('黑棋胜利，请重新游戏',screen,30)
+    sleep(10)
 
 
 if __name__ == "__main__":
