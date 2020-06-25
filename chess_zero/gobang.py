@@ -44,7 +44,7 @@ class PvEWorker:
         while True:
             cur = self.cur_pipes.pop()
             play_config = self.play_config
-            play_config.simulation_num_per_move = 300
+            play_config.simulation_num_per_move = 1200
             play_config.tau_decay_rate = 0
             robot = ChessPlayer(self.config, pipes=cur, play_config=play_config)
             score = play_game(robot, (game_idx % 2) == 0)
