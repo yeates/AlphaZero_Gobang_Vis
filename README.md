@@ -6,4 +6,4 @@ An implementation of gobang game (aka five-in-a-row) which base on alpha zero al
 
 - [ ] Trained model with nice performance.
 - [ ] Altering the code version as PyTorch.
-- [ ] PVE GUI.
+- [x] PVE GUI.
