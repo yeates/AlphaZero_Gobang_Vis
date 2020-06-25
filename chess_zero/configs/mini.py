@@ -8,7 +8,7 @@ class EvaluateConfig:
         self.game_num = 120
         self.replace_rate = 0.55
         self.play_config = PlayConfig()
-        self.play_config.simulation_num_per_move = 300 # 200
+        self.play_config.simulation_num_per_move = 200 # 200
         self.play_config.thinking_loop = 1
         self.play_config.c_puct = 1 # lower  = prefer mean action value
         self.play_config.tau_decay_rate = 0.09 # I need a better distribution...
@@ -31,7 +31,7 @@ class PlayConfig:
         self.max_processes = 3 # 3
         self.search_threads = 16 # 16
         self.vram_frac = 1.0
-        self.simulation_num_per_move = 300 # 100
+        self.simulation_num_per_move = 150 # 100
         self.thinking_loop = 1
         self.logging_thinking = False
         self.c_puct = 1.1 # 1.5
